@@ -8,5 +8,6 @@
 目录：
 
 1. 基本配置：[master分支](https://github.com/ChunchunIsMe/studyWebpack "master");
+2. 确认wepack支持三种导入规范： [checkImport分支](https://github.com/ChunchunIsMe/studyWebpack/tree/checkImport "checkImport");
 
 
