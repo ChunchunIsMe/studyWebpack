@@ -1,3 +1,6 @@
+import './css/base.css';
+import './scss/main.scss';
+
 console.log('你好,朋友！');
 
 /**

@@ -1,6 +1,8 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -16,7 +18,17 @@ module.exports = {
     new HTMLWebpackPlugin({   // 自动生成一个html文件并且引入打包的js
       title: 'studyWebpack'   // html的title
     }),
-    new CleanWebpackPlugin()   // 默认情况下清除dist下所有文件再进行打包
+    new CleanWebpackPlugin(),   // 默认情况下清除dist下所有文件再进行打包
+    new MiniCssExtractPlugin({  // 将css单独打包成文件
+      filename: '[name].css',
+      chunkFilename: '[id].css'
+    }),
+    new OptimizeCssAssetsPlugin({
+      assetNameRegExp: /\.css$/g,
+      cssProcessor: require('cssnano'), //用于优化\最小化 CSS 的 CSS处理器，默认为 cssnano
+      cssProcessorOptions: { safe: true, discardComments: { removeAll: true } }, //传递给 cssProcessor 的选项，默认为{}
+      canPrint: true //布尔值，指示插件是否可以将消息打印到控制台，默认为 true
+    })
   ],
   module: {
     rules: [
@@ -26,6 +38,16 @@ module.exports = {
         use: {
           loader: 'babel-loader'  // 使用 babel-loader
         }
+      },
+      {
+        test: /\.(scss|css)$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          'css-loader',
+          'sass-loader'
+        ]
       }
     ]
   }
