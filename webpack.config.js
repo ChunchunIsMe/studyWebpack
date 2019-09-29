@@ -7,16 +7,25 @@ module.exports = {
     main: './src/index.js'  // 需要打包的文件入口
   },
   output: {
-    publicPath: __dirname + '/dist/', // js引用的地址或者CDN地址
+    publicPath: './', // js引用的地址或者CDN地址
     path: path.resolve(__dirname, 'dist'), // 文件打包的输出目录
     filename: '[name].[hash].js',    // 打包生产的js文件名
     chunkFilename: '[name].[hash].js' // 代码拆分后的文件名
   },
   plugins: [
-    new HTMLWebpackPlugin({   // 自动生成一个html文件并且引入打包的js
-      title: 'studyWebpack'   // html的title
+    new HTMLWebpackPlugin({
+      // 打包输出HTML
+      title: '自动生成 HTML',
+      minify: {
+        // 压缩 HTML 文件
+        removeComments: true, // 移除 HTML 中的注释
+        collapseWhitespace: true, // 删除空白符与换行符
+        minifyCSS: true // 压缩内联 css
+      },
+      filename: 'index.html', // 打包生成后的文件名
+      template: 'index.html' // 根据此模版生成 HTML 文件
     }),
-    new CleanWebpackPlugin()   // 默认情况下清除dist下所有文件再进行打包
+    new CleanWebpackPlugin()
   ],
   module: {
     rules: [

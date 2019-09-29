@@ -12,3 +12,69 @@
 3. 代码分割：[codeSplitting](https://github.com/ChunchunIsMe/studyWebpack/tree/codeSplitting "codeSplitting");
 4. Lazy Loading/Prefetching：[LazyLoadingAndPrefetching](https://github.com/ChunchunIsMe/studyWebpack/tree/LazyLoadingAndPrefetching "LazyLoadingAndPrefetching");
 5. 自动生成HTML：[autoHTML](https://github.com/ChunchunIsMe/studyWebpack/tree/autoHTML "autoHTML");
+
+## 自动生成HTML文件
+因为如果没有自动生成HTML的插件会频繁的修改html的script文件的src，非常麻烦，所以我最开始就配置了最简单的直接使用dist中生成的html来测试的，现在来学习一下这个插件
+### 安装依赖
+```
+npm i html-webpack-plugin html-loader --save-dev
+```
+### 更改配置文件
+html-webpack-plugin这个插件是在plugins这个选项中配置的，plugins这个选项就是webpack存放插件的地方，可以存放各种插件去使用，是webpack的灵魂所在。
+
+```
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+moudle.exports = {
+  // ...
+  plugins: [
+    new HtmlWebpackPlugin({
+      // 打包输出HTML
+      title: '自动生成 HTML',
+      minify: {
+        // 压缩 HTML 文件
+        removeComments: true, // 移除 HTML 中的注释
+        collapseWhitespace: true, // 删除空白符与换行符
+        minifyCSS: true // 压缩内联 css
+      },
+      filename: 'index.html', // 打包生成后的文件名
+      template: 'index.html' // 根据此模版生成 HTML 文件
+    })
+  ]
+
+  // ...
+}
+```
+
+因为使用了template选项所以我们建一个html并且在html的title加入`<%= htmlWebpackPlugin.options.title %>`
+
+但是在打包之后发现一个问题就是自动生成的HTML文件引入的JS为绝对路径，但是真实打包后都是部署在服务器上，用绝对路径肯定不行。
+
+所以我们修改成以下配置
+```
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+moudle.exports = {
+  // ...
+    output: {
+    publicPath: './', // js 引用的路径或者 CDN 地址
+    path: path.resolve(__dirname, 'dist'), // 打包文件的输出目录
+    filename: '[name].bundle.js', // 代码打包后的文件名
+    chunkFilename: '[name].js' // 代码拆分后的文件名
+  },
+  plugins: [
+    new HTMLWebpackPlugin({
+      // 打包输出HTML
+      title: '自动生成 HTML',
+      minify: {
+        // 压缩 HTML 文件
+        removeComments: true, // 移除 HTML 中的注释
+        collapseWhitespace: true, // 删除空白符与换行符
+        minifyCSS: true // 压缩内联 css
+      },
+      filename: 'index.html', // 打包生成后的文件名
+      template: 'index.html' // 根据此模版生成 HTML 文件
+    })
+  ],
+
+  // ...
+}
+```
