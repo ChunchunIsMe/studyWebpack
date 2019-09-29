@@ -40,12 +40,18 @@ module.exports = {
         }
       },
       {
-        test: /\.(scss|css)$/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader
           },
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 2  // 在一个css引入了另一个css是否启用/禁用或设置在CSS加载程序之前应用的加载程序的数量。 0:没有加载程序（默认）1:postcss-loader 2:postcss-loader，sass-loader
+            }
+          },
+          'postcss-loader',
           'sass-loader'
         ]
       }

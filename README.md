@@ -91,7 +91,12 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader
           },
-          'css-loader'
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 2  // 在一个css引入了另一个css是否启用/禁用或设置在CSS加载程序之前应用的加载程序的数量。 0:没有加载程序（默认）1:postcss-loader 2:postcss-loader，sass-loader
+            }
+          }
         ]
       }
     ],
@@ -170,7 +175,12 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader
           },
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 2 // 在一个css引入了另一个css是否启用/禁用或设置在CSS加载程序之前应用的加载程序的数量。 0:没有加载程序（默认）1:postcss-loader 2:postcss-loader，sass-loader
+            }
+          },
           'sass-loader' // 使用sass-loader将scss转为css
         ]
       }
@@ -181,3 +191,70 @@ module.exports = {
 }
 ```
 > module.rules.use数组中，loader的位置。根据webpack规则：放在最后的loader首先被执行。
+### 为css加上浏览器前缀
+安装依赖
+```
+npm install postcss-loader autoprefixer --save-dev
+```
+给main.scss加上这段代码
+```
+.example {
+  display: grid;
+  transition: all 0.5s;
+  user-select: none;
+  background: linear-gradient(to bottom, white, black);
+}
+```
+有两种方法来配置postcss，第一种是直接写在webpack.config.js中
+```
+module: {
+  rules: [
+    {
+      test: /\.(sa|sc|c)ss$/,
+      use: [
+        {
+          loader: MiniCssExtractPlugin.loader
+        },
+        {
+          loader: 'css-loader',
+          options: {
+            importLoaders: 2  // 在一个css引入了另一个css是否启用/禁用或设置在CSS加载程序之前应用的加载程序的数量。 0:没有加载程序（默认）1:postcss-loader 2:postcss-loader，sass-loader
+          }
+        },
+        {
+          loader: 'postcss-loader',
+          options: {
+            plugins: [require('autoprefixer')]
+          }
+        },
+        'sass-loader'
+      ]
+    }
+  ]
+}
+```
+第二种方法，在webpack.config.js同级目录下，新建postcss.config.js配置文件
+```
+// postcss.config.js
+moudle.exports = {
+  plugins: [require('autoprefixer')]
+}
+```
+同时在webpack.config.js中
+```
+module: {
+  rules: [
+    {
+      test: /\.(sa|sc|c)ss$/, // 针对 .sass .scss 或者 .css 后缀的文件设置 loader
+      use: [
+        {
+          loader: MiniCssExtractPlugin.loader
+        },
+        'css-loader',
+        'postcss-loader', // 使用 postcss 为 css 加上浏览器前缀
+        'sass-loader' // 使用 sass-loader 将 scss 转为 css
+      ]
+    }
+  ]
+}
+```
