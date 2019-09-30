@@ -53,7 +53,7 @@ module.exports = {
 
 在base.css中写入样式
 
-````
+```
 * {
   margin: 0;
   padding: 0;
