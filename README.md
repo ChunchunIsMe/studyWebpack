@@ -27,10 +27,13 @@ css-loader:负责解析CSS代码，主要是为了处理CSS中的依赖，例如
 
 style-loader:会将css-loader解析的结果转变成JS代码，运行时动态插入style标签来让CSS代码生效。
 ### 安装依赖
+
 ```
 npm i css-loader style-loader --save-dev
 ```
+
 更改配置文件
+
 ```
 module.exports = {
   // ...
@@ -45,9 +48,11 @@ module.exports = {
   // ...
 }
 ```
+
 配置module中的rules属性，和配置babel一样，首先在test中使用正则来过滤.css文件，对.css文件使用loader，'style-loader', 'css-loader'
 
 在base.css中写入样式
+
 ````
 * {
   margin: 0;
@@ -57,13 +62,16 @@ html {
   background: red;
 }
 ```
+
 然后将base导入到index.js中
+
 ```
 // index.js
 import './css/base.css';
 
 // ...
 ```
+
 执行构建命令就可以看到效果了
 
 但是打包后查看dist文件发现并没有生成css文件，但是打开index.html是有样式的
@@ -73,10 +81,13 @@ import './css/base.css';
 如果需要单独把css文件分离出来，我们需要使用mini-css-extract-plugin插件
 
 之前是使用extract-text-webpack-plugin插件，此插件和webpack4不是太匹配，现在使用mini-css-extract-pligin具体见官网配置：[useLoader](https://webpack.js.org/plugins/mini-css-extract-plugin/ "官网配置");
+
 ```
 npm i mini-css-extract-plugin --save-dev
 ```
+
 更改配置文件
+
 ```
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -111,13 +122,17 @@ module.exports = {
   // ...
 }
 ```
+
 这样只是生成了单独的css文件，但是并没有压缩，
 引入[optimize-css-assets-webpack-plugin](https://www.npmjs.com/package/optimize-css-assets-webpack-plugin "官网配置");
 插件来实现压缩
+
 ```
 npm i optimize-css-assets-webpack-plugin --save-dev
 ```
+
 再次修改plugins
+
 ```
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 打包css文件
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); // 压缩css文件
@@ -142,15 +157,19 @@ module.exports = {
   // ...
 }
 ```
+
 随后就可以发现css已经被压缩了，并且html也是有样式的
 ### 处理sass
 安装sass依赖:
+
 ```
 npm i node-sass sass-loader --save-dev
 ```
+
 在src文件夹下新增scss文件夹及main.scss文件
 
 main.scss引入样式
+
 ```
 $bgColor: black !default;
 * {
@@ -161,7 +180,9 @@ html {
   background-color: $bgColor;
 }
 ```
+
 修改配置文件
+
 ```
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
@@ -190,13 +211,17 @@ module.exports = {
   // ...
 }
 ```
+
 > module.rules.use数组中，loader的位置。根据webpack规则：放在最后的loader首先被执行。
 ### 为css加上浏览器前缀
 安装依赖
+
 ```
 npm install postcss-loader autoprefixer --save-dev
 ```
+
 给main.scss加上这段代码
+
 ```
 .example {
   display: grid;
@@ -205,7 +230,9 @@ npm install postcss-loader autoprefixer --save-dev
   background: linear-gradient(to bottom, white, black);
 }
 ```
+
 有两种方法来配置postcss，第一种是直接写在webpack.config.js中
+
 ```
 module: {
   rules: [
@@ -233,14 +260,18 @@ module: {
   ]
 }
 ```
+
 第二种方法，在webpack.config.js同级目录下，新建postcss.config.js配置文件
+
 ```
 // postcss.config.js
 moudle.exports = {
   plugins: [require('autoprefixer')]
 }
 ```
+
 同时在webpack.config.js中
+
 ```
 module: {
   rules: [
