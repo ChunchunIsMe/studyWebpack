@@ -13,6 +13,7 @@
 4. Lazy Loading/Prefetching：[LazyLoadingAndPrefetching](https://github.com/ChunchunIsMe/studyWebpack/tree/LazyLoadingAndPrefetching "LazyLoadingAndPrefetching");
 5. 自动生成HTML：[autoHTML](https://github.com/ChunchunIsMe/studyWebpack/tree/autoHTML "autoHTML");
 6. 使用Loader：[useLoader](https://github.com/ChunchunIsMe/studyWebpack/tree/useLoader "useLoader");
+7. TreeShaking： [TreeShaking](https://github.com/ChunchunIsMe/studyWebpack/tree/TreeShaking "TreeShaking");
 
 ## 自动生成HTML文件
 因为如果没有自动生成HTML的插件会频繁的修改html的script文件的src，非常麻烦，所以我最开始就配置了最简单的直接使用dist中生成的html来测试的，现在来学习一下这个插件
