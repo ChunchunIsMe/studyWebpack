@@ -13,6 +13,7 @@
 4. Lazy Loading/Prefetching：[LazyLoadingAndPrefetching](https://github.com/ChunchunIsMe/studyWebpack/tree/LazyLoadingAndPrefetching "LazyLoadingAndPrefetching");
 5. 自动生成HTML：[autoHTML](https://github.com/ChunchunIsMe/studyWebpack/tree/autoHTML "autoHTML");
 6. 使用Loader：[useLoader](https://github.com/ChunchunIsMe/studyWebpack/tree/useLoader "useLoader");
+7. TreeShaking： [TreeShaking](https://github.com/ChunchunIsMe/studyWebpack/tree/TreeShaking "TreeShaking");
 
 ## Lazy Loading
 懒加载能够加快网页的加载速度，如果你把详情页、弹窗等页面全部打包到一个js文件中，用户如果只访问首页代码就只需要首页的代码，不需要其他页面的代码，加入多余的代码就会让加载时间变长，所以我们可以进行懒加载
