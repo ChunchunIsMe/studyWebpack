@@ -6,6 +6,10 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 将 css 单�
 const PurifyCSS = require('purifycss-webpack');
 const glob = require('glob-all');
 
+let spritesConfig = {
+  spritePath: './dist/images'
+}
+
 module.exports = {
   entry: {
     main: './src/index.js'  // 需要打包的文件入口
@@ -59,7 +63,42 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader
           },
-          'css-loader'
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: 'postcss',
+              plugins: [require('postcss-sprites')(spritesConfig)]
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name]-[hash:5].min.[ext]',
+              outputPath: 'images/',  // 输出到images目录下
+              limit: 20000            // 小于20kb转换成base64
+            }
+          },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              // 压缩 jpg/jpeg 图片
+              mozjpeg: {
+                progressive: true,
+                quality: 65 // 压缩率
+              },
+              // 压缩 png 图片
+              pngquant: {
+                quality: [0.65, 0.9],
+                speed: 4
+              }
+            }
+          }
         ]
       }
     ]

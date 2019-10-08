@@ -1,24 +1,29 @@
-html {
-  background-color: red;
+* {
+  margin: 0;
+  padding: 0;
 }
 
 .box {
-  height: 200px;
+  height: 400px;
+  width: 600px;
+  border: 5px solid #000;
+  color: #000;
+}
+
+.box div {
   width: 200px;
-  border-radius: 50%;
-  background-color: green;
+  height: 600px;
+  float: left;
 }
 
-.box-big {
-  height: 300px;
-  width: 300px;
-  border-radius: 50%;
-  background-color: blue;
+.box .ani1 {
+  background: url('./../assets/imgs/1.jpg') no-repeat;
 }
 
-.box-small {
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  background-color: yellow;
+.box .ani2 {
+  background: url('./../assets/imgs/2.jpg') no-repeat;
+}
+
+.box .ani3 {
+  background: url('./../assets/imgs/3.jpg') no-repeat;
 }

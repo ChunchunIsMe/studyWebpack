@@ -14,97 +14,50 @@
 5. 自动生成HTML：[autoHTML](https://github.com/ChunchunIsMe/studyWebpack/tree/autoHTML "autoHTML");
 6. 使用Loader：[useLoader](https://github.com/ChunchunIsMe/studyWebpack/tree/useLoader "useLoader");
 7. TreeShaking： [TreeShaking](https://github.com/ChunchunIsMe/studyWebpack/tree/TreeShaking "TreeShaking");
+8. 图片处理： [setImg](https://github.com/ChunchunIsMe/studyWebpack/tree/setImg "setImg");
 
-## TreeShaking
-TreeShaking就是打包的时候把没有用的代码去掉
-### JSTreeShaking
-JS的TreeShaking依赖的是ES6的模块系统
-#### 处理自行写的代码
-写好util.js的测试代码
-```
-// util.js
-export function a() {
-  return 'function a'
-}
-
-export function b() {
-  return 'function b'
-}
-
-export function c() {
-  return 'function c'
-}
-```
-
-在inde.js中导入util.js中的a
-```
-import { a } from './vender/util';
-console.log(a());
-```
-打包后你就会发现并没有将function b和function c打包进去
-#### 处理库代码
-如果是对于经常使用的库代码，如之前经常使用的lodash
-
-安装lodash
-```
-npm i lodash --save
-```
-
-在index.js中导入lodash中的一个函数
-```
-import { chunk } from 'lodash';
-console.log(chunk([1, 2, 3], 2));
-```
-这个时候打包的js却有70k左右，所以肯定没有进行TreeShaking这个原因是因为lodash使用的是CommandJS而不是ES6的写法，
-所以我们安装相对应的系统模块即可。
-```
-npm i lodash-es --save
-```
-然后修改一下index.js
-```
-import { chunk } from 'lodash-es';
-// ...
-```
-之后打包，可以看到main变成了3k左右很显然是进行了TreeShaking的
-### CSSTreeShaking
-首先编写/src/css/base.css,样式文件，在文件中定义三个样式类。但是在代码中，我们只会用两个类。代码如下所示：
+## 图片处理汇总
+这次的代码我们在TreeShaking的代码上进行修改
+### 准备工作
+首先放三张图片到src/assets/imgs/下并且修改base.css,并且删除util.js。base.css、index.js和index.html如下
 ```
 // base.css
-html {
-  background-color: red;
+* {
+  margin: 0;
+  padding: 0;
 }
 
 .box {
-  height: 200px;
+  height: 400px;
+  width: 600px;
+  border: 5px solid #000;
+  color: #000;
+}
+
+.box div {
   width: 200px;
-  border-radius: 50%;
-  background-color: green;
+  height: 600px;
+  float: left;
 }
 
-.box-big {
-  height: 300px;
-  width: 300px;
-  border-radius: 50%;
-  background-color: blue;
+.box .ani1 {
+  background: url('./../assets/imgs/1.jpg') no-repeat;
 }
 
-.box-small {
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  background-color: yellow;
+.box .ani2 {
+  background: url('./../assets/imgs/2.jpg') no-repeat;
+}
+
+.box .ani3 {
+  background: url('./../assets/imgs/3.jpg') no-repeat;
 }
 ```
-使用JS进行操作DOM
+index.js
 ```
 // index.js
-import base from './css/base.css';
-let app = document.getElementById('app');
-let div = document.createElement('div');
-div.className = 'box';
-app.appendChild(div);
+import './css/base.css'
 ```
-然后定义index.html。注意，这里需要使用HTMLWebpackPlugin的template属性来指定打包后的html模板
+index.html
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -117,60 +70,109 @@ app.appendChild(div);
 <body>
   <div>你好</div>
   <div id="app">
-    <div class="box-big"></div>
+    <div class="box">
+      <div class="ani1"></div>
+      <div class="ani2"></div>
+      <div class="ani3"></div>
+    </div>
   </div>
 </body>
 </html>
 ```
-然后安装依赖，安装mini-css-extract-plugin将css独立出来便于我们观察
-
-glob-all是用来PurifyCSS进行路径处理
-
-PurifyCSS就是帮助我们进行TreeShaking处理
+安装依赖
 ```
-npm i css-loader mini-css-extract-plugin glob-all purifycss-webpack purify-css --save-dev
+npm i url-loader file-loader --save-dev
 ```
-更改配置
+### 图片处理和base64编码
+在webpack.config.js中的module.rules选项中进行配置，以实现让loader识别图片后缀名，并且进行指定的处理操作。
+```
+moudle.exports = {
+  // ...
+  module: {
+    rules: [
+      // ...
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name]-[hash:5].min.[ext]',
+              outputPath: 'images/',  // 输出到images目录下
+              limit: 20000            // 小于20kb转换成base64
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+只用到url-loader没有用到file-loader的原因是url-loader依赖于file-loader没有它会报错。
+### 图片压缩
+安装依赖
+```
+npm i image-webpack-loader --save-dev
+```
+webpack.config.js配置
 ```
 // ...
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 将 css 单独打包成文件
-
-const PurifyCSS = require('purifycss-webpack');
-const glob = require('glob-all');
-
 module.exports = {
   // ...
-  plugins: [
-    // ...
-    new HTMLWebpackPlugin({
-      // 打包输出HTML
-      title: '自动生成 HTML',
-      minify: {
-        // 压缩 HTML 文件
-        removeComments: true, // 移除 HTML 中的注释
-        collapseWhitespace: true, // 删除空白符与换行符
-        minifyCSS: true // 压缩内联 css
-      },
-      filename: 'index.html', // 打包生成后的文件名
-      template: 'index.html', // 根据此模版生成 HTML 文件
-      chunks: ['main']
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
-    }),
-    // 清除无用的css
-    new PurifyCSS({
-      paths: glob.sync([
-        // 要做css TreeShaking的路径文件
-        path.resolve(__dirname, './*.html'),
-        path.resolve(__dirname, './src/*.js')
-      ])
-    })
-  ],
   module: {
-    rules: {
+    rules: [
+      // ...
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name]-[hash:5].min.[ext]',
+              outputPath: 'images/',  // 输出到images目录下
+              limit: 20000            // 小于20kb转换成base64
+            }
+          },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              // 压缩 jpg/jpeg 图片
+              mozjpeg: {
+                progressive: true,
+                quality: 65 // 压缩率
+              },
+              // 压缩 png 图片
+              pngquant: {
+                quality: '65-90',
+                speed: 4
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+### 生成雪碧图
+安装依赖：
+```
+npm i postcss-loader postcss-sprites --save-dev
+```
+配置：
+```
+// ...
+
+/**
+ * 雪碧图修改在这里
+ */
+let spritesConfig = {
+  spritePath: './dist/images'
+}
+module.exports = {
+  // ...
+  module: {
+    rules: [
       // ...
       {
         test: /\.css$/,
@@ -178,11 +180,51 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader
           },
-          'css-loader'
+          'css-loader',
+          /**
+           * 雪碧图修改在这里
+           */
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: 'postcss',
+              plugins: [require('postcss-sprites')(spritesConfig)]
+            }
+          }
+        ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name]-[hash:5].min.[ext]',
+              outputPath: 'images/',  // 输出到images目录下
+              limit: 20000            // 小于20kb转换成base64
+            }
+          },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              // 压缩 jpg/jpeg 图片
+              mozjpeg: {
+                progressive: true,
+                quality: 65 // 压缩率
+              },
+              // 压缩 png 图片
+              pngquant: {
+                quality: [0.65, 0.9],
+                speed: 4
+              }
+            }
+          }
         ]
       }
-    }
+    ]
   }
 }
 ```
-随后打包代码，可以发现需要用到的css类打包进了打包后的css文件中，没有用到的css被舍弃了
+> 这里需要注意的是配置postcss-sprites之后还需要修改image-webpack-loader.options.pngquant.quality修改成[0.65, 0.9]因为不做修改会报错，我也不知道为什么。
+
+> 还有需要注意的是打包后的雪碧图十分的大。我也没有找到压缩的方法，如果能压缩的方法可以联系我。过大的图片也不推荐用雪碧图。
