@@ -1,0 +1,37 @@
+{
+  "id": "1449393",
+  "name": "ceshi",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "11086025",
+      "name": "地球仪",
+      "font_class": "diqiuyi",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "11086026",
+      "name": "记事本",
+      "font_class": "jishiben",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "11086027",
+      "name": "礼品",
+      "font_class": "lipin",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "11086028",
+      "name": "汽车",
+      "font_class": "qiche",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    }
+  ]
+}

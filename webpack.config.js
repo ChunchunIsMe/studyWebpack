@@ -61,6 +61,20 @@ module.exports = {
           },
           'css-loader'
         ]
+      },
+      {
+        test: /\.(eot|woff2?|ttf|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name]-[hash:5].min.[ext]',
+              limit: 5000, // 如果小于5kb就压缩成base64，否则就用原文件
+              publicPath: 'fonts/',
+              outputPath: 'fonts/'
+            }
+          }
+        ]
       }
     ]
   }
