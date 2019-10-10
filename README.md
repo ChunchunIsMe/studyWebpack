@@ -15,6 +15,8 @@
 6. 使用Loader：[useLoader](https://github.com/ChunchunIsMe/studyWebpack/tree/useLoader "useLoader");
 7. TreeShaking： [TreeShaking](https://github.com/ChunchunIsMe/studyWebpack/tree/TreeShaking "TreeShaking");
 8. 图片处理： [setImg](https://github.com/ChunchunIsMe/studyWebpack/tree/setImg "setImg");
+9. 字体处理： [useFont](https://github.com/ChunchunIsMe/studyWebpack/tree/useFont "useFont");
+
 ## 自动生成HTML文件
 因为如果没有自动生成HTML的插件会频繁的修改html的script文件的src，非常麻烦，所以我最开始就配置了最简单的直接使用dist中生成的html来测试的，现在来学习一下这个插件
 ### 安装依赖
