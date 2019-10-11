@@ -16,97 +16,40 @@
 7. TreeShaking： [TreeShaking](https://github.com/ChunchunIsMe/studyWebpack/tree/TreeShaking "TreeShaking");
 8. 图片处理： [setImg](https://github.com/ChunchunIsMe/studyWebpack/tree/setImg "setImg");
 9. 字体处理： [useFont](https://github.com/ChunchunIsMe/studyWebpack/tree/useFont "useFont");
+10. 提前导入JS和别名 [useJSProject](https://github.com/ChunchunIsMe/studyWebpack/tree/useJSProject "useJSProject");
 
-## TreeShaking
-TreeShaking就是打包的时候把没有用的代码去掉
-### JSTreeShaking
-JS的TreeShaking依赖的是ES6的模块系统
-#### 处理自行写的代码
-写好util.js的测试代码
-```
-// util.js
-export function a() {
-  return 'function a'
-}
+## 提前导入JS
+### 准备工作
+这次使用的是TreeShaking的代码
 
-export function b() {
-  return 'function b'
-}
+删除util.js
 
-export function c() {
-  return 'function c'
-}
+安装依赖
 ```
+npm i jquery -S
+```
+### 配置
+提前导入JS使用的是webpack.ProvidePlugin插件
 
-在inde.js中导入util.js中的a
+webpack.config.js
 ```
-import { a } from './vender/util';
-console.log(a());
-```
-打包后你就会发现并没有将function b和function c打包进去
-#### 处理库代码
-如果是对于经常使用的库代码，如之前经常使用的lodash
-
-安装lodash
-```
-npm i lodash --save
-```
-
-在index.js中导入lodash中的一个函数
-```
-import { chunk } from 'lodash';
-console.log(chunk([1, 2, 3], 2));
-```
-这个时候打包的js却有70k左右，所以肯定没有进行TreeShaking这个原因是因为lodash使用的是CommandJS而不是ES6的写法，
-所以我们安装相对应的系统模块即可。
-```
-npm i lodash-es --save
-```
-然后修改一下index.js
-```
-import { chunk } from 'lodash-es';
 // ...
-```
-之后打包，可以看到main变成了3k左右很显然是进行了TreeShaking的
-### CSSTreeShaking
-首先编写/src/css/base.css,样式文件，在文件中定义三个样式类。但是在代码中，我们只会用两个类。代码如下所示：
-```
-// base.css
-html {
-  background-color: red;
-}
-
-.box {
-  height: 200px;
-  width: 200px;
-  border-radius: 50%;
-  background-color: green;
-}
-
-.box-big {
-  height: 300px;
-  width: 300px;
-  border-radius: 50%;
-  background-color: blue;
-}
-
-.box-small {
-  height: 100px;
-  width: 100px;
-  border-radius: 50%;
-  background-color: yellow;
+const webpack = require('webpack');
+module.exports = {
+  // ...
+  plugins: [
+    // ...
+    new webapck.ProvidePlugin({
+      $: 'jquery'
+    })
+  ]
 }
 ```
-使用JS进行操作DOM
+index.js
 ```
-// index.js
-import base from './css/base.css';
-let app = document.getElementById('app');
-let div = document.createElement('div');
-div.className = 'box';
-app.appendChild(div);
+$('div').append('qwe');
 ```
-然后定义index.html。注意，这里需要使用HTMLWebpackPlugin的template属性来指定打包后的html模板
+index.html
 ```
 <!DOCTYPE html>
 <html lang="en">
@@ -117,74 +60,36 @@ app.appendChild(div);
   <title><%= htmlWebpackPlugin.options.title %></title>
 </head>
 <body>
-  <div>你好</div>
-  <div id="app">
-    <div class="box-big"></div>
-  </div>
+  <div></div>
 </body>
 </html>
 ```
-然后安装依赖，安装mini-css-extract-plugin将css独立出来便于我们观察
+打包之后可以看到打包后的html是有qwe的
+## 别名
+别名使用的是webpack中的resolve.alias
 
-glob-all是用来PurifyCSS进行路径处理
+创建 import 或 require 的别名，来确保模块引入变得更简单
 
-PurifyCSS就是帮助我们进行TreeShaking处理
+也可以在给定对象的键后的末尾添加 $，以表示精准匹配：
+### 别名配置
+webpack.config.js
 ```
-npm i css-loader mini-css-extract-plugin glob-all purifycss-webpack purify-css --save-dev
-```
-更改配置
-```
-// ...
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 将 css 单独打包成文件
-
-const PurifyCSS = require('purifycss-webpack');
-const glob = require('glob-all');
-
 module.exports = {
-  // ...
-  plugins: [
-    // ...
-    new HTMLWebpackPlugin({
-      // 打包输出HTML
-      title: '自动生成 HTML',
-      minify: {
-        // 压缩 HTML 文件
-        removeComments: true, // 移除 HTML 中的注释
-        collapseWhitespace: true, // 删除空白符与换行符
-        minifyCSS: true // 压缩内联 css
-      },
-      filename: 'index.html', // 打包生成后的文件名
-      template: 'index.html', // 根据此模版生成 HTML 文件
-      chunks: ['main']
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
-    }),
-    // 清除无用的css
-    new PurifyCSS({
-      paths: glob.sync([
-        // 要做css TreeShaking的路径文件
-        path.resolve(__dirname, './*.html'),
-        path.resolve(__dirname, './src/*.js')
-      ])
-    })
-  ],
-  module: {
-    rules: {
-      // ...
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          'css-loader'
-        ]
-      }
+  resolve: {
+    alias: {
+      // resolve.alias用来起别名像常用的@就是在这里定义
+      // abc$标识精确匹配只有当只使用abc时才会引用冒号后的值 如 abc: 'a/b/c', import 'abc' = import 'a/b/c', 'abc冒号后的值' import 'a/b/d' = import 'a/b/d'
+      // 没有则不是表示精确匹配   如：如 abc: 'a/b/c', import 'abc' = import 'a/b/c', 'abc冒号后的值' import 'a/b/d' = import 'a/b/c/b/d'
+      '@': path.resolve(__dirname, 'src'),
+      base$: path.resolve(__dirname, 'src/css/base.css')
     }
   }
 }
 ```
-随后打包代码，可以发现需要用到的css类打包进了打包后的css文件中，没有用到的css被舍弃了
+index.js
+```
+import 'base';
+$('div').append('qwe');
+$('div').addClass('box');
+```
+打包后就能看到有样式的页面了

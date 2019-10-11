@@ -3,6 +3,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin') // 将 css 单独打包成文件
 
+const webpack = require('webpack');
 const PurifyCSS = require('purifycss-webpack');
 const glob = require('glob-all');
 
@@ -15,6 +16,15 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'), // 文件打包的输出目录
     filename: '[name].[hash].js',    // 打包生产的js文件名
     chunkFilename: '[name].[hash].js' // 代码拆分后的文件名
+  },
+  resolve: {
+    alias: {
+      // resolve.alias用来起别名像常用的@就是在这里定义
+      // abc$标识精确匹配只有当只使用abc时才会引用冒号后的值 如 abc: 'a/b/c', import 'abc' = import 'a/b/c', 'abc冒号后的值' import 'a/b/d' = import 'a/b/d'
+      // 没有则不是表示精确匹配   如：如 abc: 'a/b/c', import 'abc' = import 'a/b/c', 'abc冒号后的值' import 'a/b/d' = import 'a/b/c/b/d'
+      '@': path.resolve(__dirname, 'src'),
+      base$: path.resolve(__dirname, 'src/css/base.css')
+    }
   },
   plugins: [
     new HTMLWebpackPlugin({
@@ -42,6 +52,9 @@ module.exports = {
         path.resolve(__dirname, './*.html'),
         path.resolve(__dirname, './src/*.js')
       ])
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',   // npm
     })
   ],
   module: {
