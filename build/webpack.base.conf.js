@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const path = require('path');
 
@@ -91,24 +91,30 @@ const generateConfig = env => {
     },
     module: {
       rules: [
-        new HtmlWebpackPlugin({
-          title: 'webpack4实战',
-          filename: 'index.html',
-          template: path.resolve(__dirname, '..', 'index.html'),
-          minify: {
-            collapseWhitespace: true
-          }
-        }),
-        new webpack.ProvidePlugin({
-          $: 'jquery'
-        }),
-        new CleanWebpackPlugin()
+        { test: /\.js$/, exclude: /(node_module)/, use: scriptLoader },
+        { test: /\.(sa|sc|c)ss$/, use: styleLoader },
+        { test: /\.(eot|woff2?|ttf|svg)$/, use: fontLoader },
+        { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader }
       ]
-    }
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        title: 'webpack4实战',
+        filename: 'index.html',
+        template: path.resolve(__dirname, '..', 'index.html'),
+        minify: {
+          collapseWhitespace: true
+        }
+      }),
+      new webpack.ProvidePlugin({
+        $: 'jquery'
+      }),
+      new CleanWebpackPlugin()
+    ]
   }
 }
 
 module.exports = env => {
   const config = env === 'production' ? productionConfig : developmentConfig
-  return merge(baseConfig, config); // 合并公共配置 和 环境配置
+  return merge(generateConfig(env), config); // 合并公共配置 和 环境配置
 }
