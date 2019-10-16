@@ -1,9 +1,24 @@
-console.log('你好,朋友！');
+import '@babel/polyfill'
 
-/**
- * 'mode'选项未设置，webpack将回退到'production'。将"mode"选项设置为'development'或'production'以启用每个环境
- * 的默认值。您还可以将其设置为'none'以用来禁止任何默认行为
- * 
- * production：开箱即用地进行了各种优化。包括压缩，作用域提升，tree-shakin等。
- * development：针对速度进行了优化，仅仅提供了一种不压缩的bundle
- */
+import './assets/style/base.scss'
+import './assets/style/common.scss'
+
+import './assets/font/iconfont.css' // 引入字体文件
+var minus = require('./vendor/minus');
+console.log('minus(1, 2) = ', minus(1, 2));
+
+require(['./vendor/multi'], function (multi) {
+  console.log('multi(1, 2) = ', multi(1, 2));
+})
+
+import sum from './vendor/sum';
+console.log('sum(1, 2) = ', sum(1, 2));
+
+$.get(
+  '/try/ajax/ajax_info.txt',
+  function (data) {
+    setTimeout(function () {
+      $('body').append(data);
+    }, 2000)
+  }
+)
