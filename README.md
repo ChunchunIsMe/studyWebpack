@@ -18,3 +18,41 @@
 9. 字体处理： [useFont](https://github.com/ChunchunIsMe/studyWebpack/tree/useFont "useFont");
 10. 提前导入JS和别名 [useJSProject](https://github.com/ChunchunIsMe/studyWebpack/tree/useJSProject "useJSProject");
 11. webpack-dev-server: [webpack-dev-server](https://github.com/ChunchunIsMe/studyWebpack/tree/webpack-dev-server "webpack-dev-server");
+12. 开发和生产模式实战：[actualCombat](https://github.com/ChunchunIsMe/studyWebpack/tree/actualCombat "actualCombat");
+
+# 开发和生产模式实战
+## 准备工作
+安装依赖
+
+webpack-dev-server依赖
+```
+npm i webpack-dev-server -D
+```
+html依赖
+```
+nmp i html-loader -D
+```
+css处理依赖
+```
+npm i css-loader style-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin -D
+```
+安装scss处理依赖
+```
+npm i node-sass sass-loader -D
+```
+为不同浏览器加上css前缀
+```
+npm i post-css autoprefixer -D
+```
+图片及字体处理
+```
+npm i url-loader file-loader image-webpack-loader -D
+```
+第三方库
+```
+npm i jquery
+```
+合并webpack配置
+```
+npm i webpack-merge -D
+```
