@@ -19,6 +19,7 @@
 10. 提前导入JS和别名 [useJSProject](https://github.com/ChunchunIsMe/studyWebpack/tree/useJSProject "useJSProject");
 11. webpack-dev-server: [webpack-dev-server](https://github.com/ChunchunIsMe/studyWebpack/tree/webpack-dev-server "webpack-dev-server");
 12. 开发和生产模式实战：[actualCombat](https://github.com/ChunchunIsMe/studyWebpack/tree/actualCombat "actualCombat");
+13. 打包自定义函数库：[selfFunction](https://github.com/ChunchunIsMe/studyWebpack/tree/selfFunction "selfFunction");
 
 ## Lazy Loading
 懒加载能够加快网页的加载速度，如果你把详情页、弹窗等页面全部打包到一个js文件中，用户如果只访问首页代码就只需要首页的代码，不需要其他页面的代码，加入多余的代码就会让加载时间变长，所以我们可以进行懒加载
