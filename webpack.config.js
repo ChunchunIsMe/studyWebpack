@@ -6,11 +6,14 @@ module.exports = {
   entry: {
     main: './src/index.js'  // 需要打包的文件入口
   },
+  externals: ['lodash'],
   output: {
     publicPath: __dirname + '/dist/', // js引用的地址或者CDN地址
     path: path.resolve(__dirname, 'dist'), // 文件打包的输出目录
-    filename: '[name].[hash].js',    // 打包生产的js文件名
-    chunkFilename: '[name].[hash].js' // 代码拆分后的文件名
+    filename: 'library.js',    // 打包生产的js文件名
+    chunkFilename: '[name].[hash].js', // 代码拆分后的文件名
+    libraryTarget: 'umd',
+    library: 'root',
   },
   plugins: [
     new HTMLWebpackPlugin({   // 自动生成一个html文件并且引入打包的js
