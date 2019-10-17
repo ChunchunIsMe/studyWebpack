@@ -26,7 +26,7 @@
 
 # 开发和生产模式实战
 ## 准备工作
-###安装依赖
+### 安装依赖
 webpack-dev-server依赖
 ```
 npm i webpack-dev-server -D
