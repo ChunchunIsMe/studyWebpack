@@ -1,32 +1,33 @@
-const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
+/* eslint-disable no-undef */
+// eslint-disable-next-line no-undef
+const path = require('path')
 
 module.exports = {
+  mode: 'production',
   entry: {
-    main: './src/index.js'  // 需要打包的文件入口
+    index: './src/index.js' // 需要打包的文件入口
   },
-  output: {
-    publicPath: __dirname + '/dist/', // js引用的地址或者CDN地址
-    path: path.resolve(__dirname, 'dist'), // 文件打包的输出目录
-    filename: '[name].[hash].js',    // 打包生产的js文件名
-    chunkFilename: '[name].[hash].js' // 代码拆分后的文件名
-  },
-  plugins: [
-    new HTMLWebpackPlugin({   // 自动生成一个html文件并且引入打包的js
-      title: 'studyWebpack'   // html的title
-    }),
-    new CleanWebpackPlugin()   // 默认情况下清除dist下所有文件再进行打包
-  ],
   module: {
     rules: [
       {
-        test: /\.js$/,   // 使用正则对象匹配js文件
-        exclude: /node_module/,  // 排除依赖包文件夹
-        use: {
-          loader: 'babel-loader'  // 使用 babel-loader
-        }
+        test: /\.js$/, // 使用正则来匹配 js 文件
+        exclude: /nodes_modules/, // 排除依赖包文件夹
+        use: [
+          {
+            loader: 'eslint-loader', // 使用 eslint-loader
+            options: {
+              fix: true
+            }
+          }
+        ]
       }
     ]
+  },
+  output: {
+    // eslint-disable-next-line no-undef
+    publicPath: __dirname + '/dist/', // js 引用的路径或者 CDN 地址
+    // eslint-disable-next-line no-undef
+    path: path.resolve(__dirname, 'dist'), // 打包文件的输出目录
+    filename: 'bundle.js' // 打包后生产的 js 文件
   }
-}
+};
