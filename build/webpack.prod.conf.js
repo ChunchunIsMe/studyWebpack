@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 将 css 单独打包成文件
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); // 压缩 css
+const WorkboxPlugin = require('workbox-webpack-plugin'); // 引入 PWA 插件
 
 module.exports = {
   mode: 'production',
@@ -18,6 +19,10 @@ module.exports = {
   },
 
   plugins: [
+    new WorkboxPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true
+    }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css'

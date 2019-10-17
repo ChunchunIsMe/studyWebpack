@@ -14,6 +14,16 @@ require(['./vendor/multi'], function (multi) {
 import sum from './vendor/sum';
 console.log('sum(1, 2) = ', sum(1, 2));
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').then(registration => {
+      console.log('service-worker registen');
+    }).catch(error => {
+      console.log('service-worker registed error');
+    })
+  })
+}
+
 $.get(
   '/try/ajax/ajax_info.txt',
   function (data) {
