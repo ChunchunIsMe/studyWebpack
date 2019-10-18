@@ -23,6 +23,7 @@
 14. PWA：[PWA](https://github.com/ChunchunIsMe/studyWebpack/tree/PWA "PWA");
 15. TypeScript配置：[setTs](https://github.com/ChunchunIsMe/studyWebpack/tree/setTs "setTs");
 16. Eslint配置：[useEslint](https://github.com/ChunchunIsMe/studyWebpack/tree/useEslint "useEslint");
+17. DLL: [DLL](https://github.com/ChunchunIsMe/studyWebpack/tree/DLL "DLL");
 
 ## Lazy Loading
 懒加载能够加快网页的加载速度，如果你把详情页、弹窗等页面全部打包到一个js文件中，用户如果只访问首页代码就只需要首页的代码，不需要其他页面的代码，加入多余的代码就会让加载时间变长，所以我们可以进行懒加载
