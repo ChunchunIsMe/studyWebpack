@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --env production --config build/webpack.base.conf.js",
-    "dev": "webpack-dev-server --env development --open --config build/webpack.base.conf.js"
+    "dev": "webpack-dev-server --env development --open --config build/webpack.base.conf.js",
+    "build:dll": "webpack --config ./build/webpack.dll.js"
   },
   "repository": {
     "type": "git",
@@ -45,7 +46,9 @@
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
     "@babel/runtime": "^7.6.2",
+    "add-asset-html-webpack-plugin": "^3.1.3",
     "core-js": "^3.2.1",
-    "jquery": "^3.4.1"
+    "jquery": "^3.4.1",
+    "lodash": "^4.17.15"
   }
 }

@@ -23,190 +23,179 @@
 14. PWA：[PWA](https://github.com/ChunchunIsMe/studyWebpack/tree/PWA "PWA");
 15. TypeScript配置：[setTs](https://github.com/ChunchunIsMe/studyWebpack/tree/setTs "setTs");
 16. Eslint配置：[useEslint](https://github.com/ChunchunIsMe/studyWebpack/tree/useEslint "useEslint");
+17. DLL: [DLL](https://github.com/ChunchunIsMe/studyWebpack/tree/DLL "DLL");
 
-# 开发和生产模式实战
+# 使用DLLPlugin加快打包速度
 ## 准备工作
-### 安装依赖
-webpack-dev-server依赖
-```
-npm i webpack-dev-server -D
-```
-html依赖
-```
-nmp i html-loader -D
-```
-css处理依赖
-```
-npm i css-loader style-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin -D
-```
-安装scss处理依赖
-```
-npm i node-sass sass-loader -D
-```
-为不同浏览器加上css前缀
-```
-npm i post-css autoprefixer -D
-```
-图片及字体处理
-```
-npm i url-loader file-loader image-webpack-loader -D
-```
-第三方库
-```
-npm i jquery
-```
-合并webpack配置
-```
-npm i webpack-merge -D
-```
-###代码和文件准备
-这次代码是基于master的代码进行修改的
+我们这次在开发和生产模式实战的代码为基础
 
-生成三个js文件分别为src/vender/minus.js    src/vender/multi.js     src/vender/sum.js
+首先安装lodash插件
 ```
-// minus.js
-module.exports = function (a, b) {
-  return a - b;
-}
-//multi.js
-define(function (require, factory) {
-  'use strict';
-  return function (a, b) {
-    return a * b;
+npm i lodash -S
+```
+给index.js增加以下代码
+```
+import _ from 'lodash'
+console.log(_.join(['hello', 'world'], '-'))
+```
+在build文件下新增webpack.dll.js文件
+```
+const path = require('path')
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    vendors: ['lodash', 'jquery']
+  },
+  output: {
+    filename: '[name].dll.js',
+    path: path.resolve(__dirname, '../dll'),
+    library: '[name]'
   }
-});
-// sum.js
-export default function (a, b) {
-  console.log('I am sum.js!');
-  return a + b;
 }
 ```
-放一些字体文件到src/assets/font下
+这里使用library，忘记的话可以回顾打包自定义函数库的内容，定义了library就相当于当script导入的时候挂载了这个全局变量，只要在控制台输入全局变量的名称就可以显示里面的内容，比如这里我们是`library: '[name]'`对应的name就是我们在entry里定义的vendors
 
-放一些图片到src/assets/images下
-
-创建两个scss文件分别为src/assets/style/base.scss    src/assets/style/common.scss
-```
-// base.scss
-* {
-  margin: 0;
-  padding: 0;
-}
-
-.img {
-  width: 200px;
-  height: 200px;
-  background-image: url('../images/1.jpg');
-}
-
-.example {
-  display: grid;
-  transition: all 0.5s;
-  user-select: none;
-  background: linear-gradient(to bottom, white, black)
-}
-// common.scss
-.app {
-  font-size: 25px;
-}
-```
-创建一个index.html在项目根目录
-```
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title><%= htmlWebpackPlugin.options.title %></title>
-</head>
-
-<body>
-  <div class="app">
-    <div>webpack4 实战</div>
-    <div class="img"></div>
-    <div class="box">
-      <span class="iconfont icon-diqiuyi"></span>
-      <span class="iconfont icon-jishiben"></span>
-      <span class="iconfont icon-lipin"></span>
-      <span class="iconfont icon-qiche"></span>
-    </div>
-    <div class="example"></div>
-  </div>
-</body>
-
-</html>
-```
-修改index.js
-```
-import '@babel/polyfill'
-
-import './assets/style/base.scss'
-import './assets/style/common.scss'
-
-import './assets/font/iconfont.css' // 引入字体文件
-var minus = require('./vendor/minus');
-console.log('minus(1, 2) = ', minus(1, 2));
-
-require(['./vendor/multi'], function (multi) {
-  console.log('multi(1, 2) = ', multi(1, 2));
-})
-
-import sum from './vendor/sum';
-console.log('sum(1, 2) = ', sum(1, 2));
-
-$.get(
-  '/try/ajax/ajax_info.txt',
-  function (data) {
-    setTimeout(function () {
-      $('body').append(data);
-    }, 2000)
-  }
-)
-```
-## 开始配置webpack
-### 前言
-之前大多都是写生产模式，但是我们日常开发项目都是用的开发模式
-
-只有当项目做完之后，部署到nginx上的时候才使用生产模式，将代码打包后放到nginx中
-
-之所以要分两种模式是因为，开发模式下，需要加快编译的速度，可以热更新以及跨域地址，开启源码调试(source-map)
-
-所以我们将webpack配置拆分三个文件来写，一个生产配置，一个开发配置，最后一个基础配置
-
-即：webpack.base.conf.js、webpack.dev.conf.js、webpack.prod.conf.js
-
-新建这三个文件并放在根目录的build下
-
-这里需要使用到一个插件，webpack-merge来合并配置。
-```
-npm i webpack-merge -D
-```
-所以编写配置文件的步骤是
-1. 引入webpack-merge插件来合并配置
-2. 引入生产和开发环境配置
-3. 编写基础配置
-4. 导出合并后的配置文件
-
-在代码中区分不同环境：
-```
-module.export = env => {
-  const config = env === 'production' ? productionConfig: developmentConfig;
-  return merge(baseConfig, config)  // 合并 公共配置 和 环境配置
-}
-```
-这里的env在package.json中配置,修改scripts，添加'dev'和'build'命令
-
-注意，这里有个--env字段，与webpack.base.conf.js中的env是联动的，告诉它当前是什么环境，然后合并成什么环境
+在package.json中的script再新增一个命令
 ```
 "scripts": {
     "build": "webpack --env production --config build/webpack.base.conf.js",
-    "dev": "webpack-dev-server --env development --open --config build/webpack.base.conf.js"
+    "dev": "webpack-dev-server --env development --open --config build/webpack.base.conf.js",
+    "build:dll": "webpack --config ./build/webpack.dll.js"
 }
 ```
-### 配置编写
-webpack.base.conf.js
+然后运行npm run build:dll,就会生成dll文件夹，并且文件为vendors.dll.js
+
+那我们要怎么使用vendors.dll.js文件呢
+
+这个时候我们需要再安装一个依赖`npm i add-asset-html-webpack-plugin -D`,它会将js文件注入到我们生成的index.html中
+
+在webpack.base.conf.js文件中引入,这里需要注意，add-asset-html-webpack-plugin插件应该放在html-webpack-plugin的后面
+```
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin'); // 引入
+// ...
+module.exports = {
+  // ...
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'webpack4实战',
+      filename: 'index.html',
+      template: path.resolve(__dirname, '..', 'index.html'),
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    // ...
+    new AddAssetHtmlWebpackPlugin({
+      filepath: path.resolve(__dirname, '../dll/vendors.dll.js') // 对应的 dll 文件路径
+    })
+  ]
+}
+```
+然后npm run dev打开网页，这个时候你在console输入vendors就可以看到内容
+
+现在我们已经把第三方模块单独打包成了dll文件，并使用
+
+但是现在使用第三方模块的时候，要用dll文件，而不是使用/node_modules/中的库，继续来修改webpac.dll.js配置
+```
+const path = require('path')
+const webpack = require('webpack')
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    vendors: ['lodash', 'jquery']
+  },
+  output: {
+    filename: '[name].dll.js',
+    path: path.resolve(__dirname, '../dll'),
+    library: '[name]'
+  },
+  plugins: [
+    new webpack.DllPlugin({
+      name: '[name]',
+      // 用这个插件来分析打包后的这个库，把库里的第三方映射关系放在了这个 json 的文件下，这个文件在 dll 目录下
+      path: path.resolve(__dirname, '../dll/[name].manifest.json')
+    })
+  ]
+}
+```
+保存后重新运行`npm run build:dll`,然后就发现文件夹中多了vendors.manifest.json，这个是一个映射文件
+
+然后我们要在正式打包的时候使用到这个映射文件，让打包的代码不是使用库中的代码而是使用我们的js，这个时候就要用到webpack.DllReferencePlugin 插件
+
+修改webpac.base.conf.js
+```
+const webpack = require('webpack');
+module.exports = {
+  plugins: [
+    // ...
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, '../dll/vendors.manifest.json')
+    })
+  ]
+}
+```
+之后webpack打包的时候，就可以结合之前的全局变量vendors和这个新生成的vendors.manifest.json映射文件，然后来对我们的源代码进行分析，一旦分析出使用的第三方库是在vendors.dll.js里，就会去使用vendors.dll.js,不会去使用/node_modules/里的第三方库了
+
+再次打包`npm run build`,可以吧webpack.DllReferencePlugin模块注释后再打包比较一下，会发现节省了时间。
+
+还可以继续拆分，修改webpack.dll.js文件
+```
+const path = require('path')
+const webpack = require('webpack')
+
+module.exports = {
+  mode: 'production',
+  entry: {
+    lodash: ['lodash'],
+    jquery: ['jquery']
+  },
+  output: {
+    filename: '[name].dll.js',
+    path: path.resolve(__dirname, '../dll'),
+    library: '[name]'
+  },
+  plugins: [
+    new webpack.DllPlugin({
+      name: '[name]',
+      path: path.resolve(__dirname, '../dll/[name].manifest.json') // 用这个插件来分析打包后的这个库，把库里的第三方映射关系放在了这个 json 的文件下，这个文件在 dll 目录下
+    })
+  ]
+}
+```
+运行`npm run build:dll`
+
+可以把之前打包的vendors.dll.js和vendors.manifest.json映射文件给删除掉
+
+然后修改webpack.base.conf.js
+```
+// ...
+module.exports = {
+  // ...
+  plugins: [
+    // ...
+    new AddAssetHtmlWebpackPlugin({
+      filepath: path.resolve(__dirname, '../dll/lodash.dll.js')
+    }),
+    new AddAssetHtmlWebpackPlugin({
+      filepath: path.resolve(__dirname, '../dll/jquery.dll.js')
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, '../dll/lodash.manifest.json')
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname, '../dll/jquery.manifest.json')
+    })
+  ]
+}
+```
+然后运行`npm run dev`发现可以成功运行
+
+如果这样一个个配置过去会发现真的很麻烦，所以我们可以使用文件操作来读取文件夹中的内容
+
+最终webpack.base.conf.js代码
 ```
 const webpack = require('webpack');
 const merge = require('webpack-merge');
@@ -215,9 +204,12 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const path = require('path');
+const fs = require('fs');
 
 const productionConfig = require('./webpack.prod.conf'); // 引入生产环境配置文件
 const developmentConfig = require('./webpack.dev.conf'); // 引入开发环境配置文件
+
+const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin'); // 引入
 
 /**
  * 根据不同的环境，生成不同的配置
@@ -288,6 +280,39 @@ const generateConfig = env => {
 
   const styleLoader = env === 'production' ? cssExtractLoader : cssLoader;
 
+  const plugins = [
+    new HtmlWebpackPlugin({
+      title: 'webpack4实战',
+      filename: 'index.html',
+      template: path.resolve(__dirname, '..', 'index.html'),
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery'
+    }),
+    new CleanWebpackPlugin()
+  ]
+
+  const files = fs.readdirSync(path.resolve(__dirname, '../dll'));
+  files.forEach(file => {
+    if (/.*\.dll.js/.test(file)) {
+      plugins.push(
+        new AddAssetHtmlWebpackPlugin({
+          filepath: path.resolve(__dirname, '../dll', file)
+        })
+      )
+    }
+
+    if (/.*\.manifest.json/.test(file)) {
+      plugins.push(
+        new webpack.DllReferencePlugin({
+          manifest: path.resolve(__dirname, '../dll', file)
+        })
+      )
+    }
+  })
 
   return {
     entry: {
@@ -307,20 +332,7 @@ const generateConfig = env => {
         { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader }
       ]
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        title: 'webpack4实战',
-        filename: 'index.html',
-        template: path.resolve(__dirname, '..', 'index.html'),
-        minify: {
-          collapseWhitespace: true
-        }
-      }),
-      new webpack.ProvidePlugin({
-        $: 'jquery'
-      }),
-      new CleanWebpackPlugin()
-    ]
+    plugins
   }
 }
 
@@ -329,86 +341,3 @@ module.exports = env => {
   return merge(generateConfig(env), config); // 合并公共配置 和 环境配置
 }
 ```
-webpack.dev.conf.js
-```
-const webpack = require('webpack');
-
-const path = require('path');
-
-module.exports = {
-  mode: 'development',
-  devtool: 'source-map',
-  devServer: {
-    contentBase: path.join(__dirname, '../dist/'),
-    port: 8000,
-    hot: true, // 热重载
-    overlay: true, // 如果代码出错，会在浏览器页面弹出“浮动层”。类似于 vue-cli 等脚手架
-    proxy: {
-      // 跨域代理转发如果try开头的接口就进行代理转发
-      '/try': {
-        target: 'https://www.runoob.com',
-        changeOrigin: true,
-        logLevel: 'debug',
-        headers: {
-          Cookie: ''
-        }
-      }
-    },
-    historyApiFallback: true
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin()
-  ]
-}
-```
-webpack.prod.conf.js
-```
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // 将 css 单独打包成文件
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin'); // 压缩 css
-
-module.exports = {
-  mode: 'production',
-
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        jquery: {
-          name: 'chunk-juqery', // 单独将jquery拆包
-          priority: 15,
-          test: /[\\/]node_modules][\\/]jquery[\\/]/
-        }
-      }
-    }
-  },
-
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css'
-    }),
-    // 压缩 css
-    new OptimizeCssAssetsPlugin({
-      assetNameRegExp: /\.css$/g, // 一个正则表达式，指示应优化/最小化的资产的名称。提供的正则表达式针对配置中ExtractTextPlugin实例导出的文件的文件名运行，而不是源css文件的文件名。默认为/\.css$/g
-      cssProcessor: require('cssnano'), // 用于优化/最小化css的css处理器，默认为 cssnano
-      cssProcessorOptions: { // 传递给cssProcessor的选项，默认为{}
-        safe: true,
-        discardComments: {
-          removeAll: true
-        }
-      },
-      canPrint: true // 一个布尔值，指示插件是否可以将信息打印到控制台，默认为true
-    })
-  ]
-}
-```
-因为使用了postcss-loader所以要写postcss.config.js
-```
-module.exports = {
-  plugins: [require('autoprefixer')]
-}
-```
-随后就可以使用npm run build 和 npm run dev 来测试一下生产模式和开发模式啦
-
-> 需要注意的是生产模式下跨域失败是很正常的，而且如果是 vue 项目打包完之后是无法直接打开 index.html 文件查看效果的必须要放在服务器上，一般都是将打包后的文件放入 nginx 中，在 nginx 中配置跨域地址

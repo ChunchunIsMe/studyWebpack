@@ -5,9 +5,12 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 const path = require('path');
+const fs = require('fs');
 
 const productionConfig = require('./webpack.prod.conf'); // 引入生产环境配置文件
 const developmentConfig = require('./webpack.dev.conf'); // 引入开发环境配置文件
+
+const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin'); // 引入
 
 /**
  * 根据不同的环境，生成不同的配置
@@ -78,6 +81,39 @@ const generateConfig = env => {
 
   const styleLoader = env === 'production' ? cssExtractLoader : cssLoader;
 
+  const plugins = [
+    new HtmlWebpackPlugin({
+      title: 'webpack4实战',
+      filename: 'index.html',
+      template: path.resolve(__dirname, '..', 'index.html'),
+      minify: {
+        collapseWhitespace: true
+      }
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery'
+    }),
+    new CleanWebpackPlugin()
+  ]
+
+  const files = fs.readdirSync(path.resolve(__dirname, '../dll'));
+  files.forEach(file => {
+    if (/.*\.dll.js/.test(file)) {
+      plugins.push(
+        new AddAssetHtmlWebpackPlugin({
+          filepath: path.resolve(__dirname, '../dll', file)
+        })
+      )
+    }
+
+    if (/.*\.manifest.json/.test(file)) {
+      plugins.push(
+        new webpack.DllReferencePlugin({
+          manifest: path.resolve(__dirname, '../dll', file)
+        })
+      )
+    }
+  })
 
   return {
     entry: {
@@ -97,20 +133,7 @@ const generateConfig = env => {
         { test: /\.(png|jpg|jpeg|gif)$/, use: imageLoader }
       ]
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        title: 'webpack4实战',
-        filename: 'index.html',
-        template: path.resolve(__dirname, '..', 'index.html'),
-        minify: {
-          collapseWhitespace: true
-        }
-      }),
-      new webpack.ProvidePlugin({
-        $: 'jquery'
-      }),
-      new CleanWebpackPlugin()
-    ]
+    plugins
   }
 }
 
