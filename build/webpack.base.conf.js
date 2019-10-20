@@ -88,7 +88,17 @@ const generateConfig = env => {
       template: path.resolve(__dirname, '..', 'index.html'),
       minify: {
         collapseWhitespace: true
-      }
+      },
+      chunks: ['index', 'vendors', 'code-segment', 'jquery', 'lodash']
+    }),
+    new HtmlWebpackPlugin({
+      title: 'webpack4实战',
+      filename: 'list.html',
+      template: path.resolve(__dirname, '..', 'index.html'),
+      minify: {
+        collapseWhitespace: true
+      },
+      chunks: ['list', 'vendors', 'code-segment', 'jquery', 'lodash']
     }),
     new webpack.ProvidePlugin({
       $: 'jquery'
@@ -117,7 +127,8 @@ const generateConfig = env => {
 
   return {
     entry: {
-      index: './src/index.js'
+      index: './src/index.js',
+      list: './src/list.js'
     },
     output: {
       publicPath: env === 'development' ? '/' : './',

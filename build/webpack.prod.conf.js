@@ -12,6 +12,9 @@ module.exports = {
           name: 'chunk-juqery', // 单独将jquery拆包
           priority: 15,
           test: /[\\/]node_modules][\\/]jquery[\\/]/
+        },
+        default: {
+          name: 'code-segment'
         }
       }
     }
