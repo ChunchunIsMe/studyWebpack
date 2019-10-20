@@ -150,7 +150,7 @@ const loaderUtils = require('loader-utils');
 module.exports = async function (source) {
   const options = loaderUtils.getOptions(this);
   
-  const result = new Promise(re => {
+  const result = await new Promise(re => {
     setTimeout(() => {
       const result = source.replace('world', options.name);
       re(result);
