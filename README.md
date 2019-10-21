@@ -28,3 +28,14 @@
 19. 编写loader: [writeLoader](https://github.com/ChunchunIsMe/studyWebpack/tree/writeLoader "writeLoader");
 20. 编写plugins: [writePlugins](https://github.com/ChunchunIsMe/studyWebpack/tree/writePlugins "writePlugins");
 21. 编写bundle: [writeBundle](https://github.com/ChunchunIsMe/studyWebpack/tree/writeBundle "writeBundle");
+
+我是真菜，ast是啥都不知道，所以这节真的不是很明白，这里记录一些ast的文章，希望对自己以后有帮助吧
+
+https://segmentfault.com/a/1190000016231512
+
+https://github.com/ChunchunIsMe/the-super-tiny-compiler
+
+在此感谢
+https://itxiaohao.github.io/
+
+https://xin-tan.com/
